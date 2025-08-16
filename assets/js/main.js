@@ -131,3 +131,235 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Mobile Menu Functionality
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+const mobileNav = document.querySelector('.mobile-nav');
+const mobileCloseBtn = document.querySelector('.mobile-close-btn');
+
+menuToggle.addEventListener('click', function() {
+    mobileMenuOverlay.classList.add('active');
+    mobileNav.classList.add('active');
+    document.body.style.overflow = 'hidden';
+});
+
+mobileCloseBtn.addEventListener('click', function() {
+    closeMobileMenu();
+});
+
+mobileMenuOverlay.addEventListener('click', function() {
+    closeMobileMenu();
+});
+
+function closeMobileMenu() {
+    mobileMenuOverlay.classList.remove('active');
+    mobileNav.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close mobile menu when clicking on a link
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
+    link.addEventListener('click', function() {
+        closeMobileMenu();
+    });
+});
+
+// Touch device detection
+function isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints;
+}
+
+// Adjust animations for mobile
+if (isTouchDevice()) {
+    // Reduce particle count on mobile
+    if (document.getElementById('particles-js')) {
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 40 }, // Reduced from 80
+                // Rest of config remains same
+            }
+        });
+    }
+    
+    // Disable parallax on mobile
+    const parallaxImage = document.querySelector('.parallax');
+    if (parallaxImage) {
+        parallaxImage.style.transform = 'none';
+    }
+}
+
+// Mobile-specific smooth scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        if (window.innerWidth <= 767) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    });
+});
+// Collections Carousel Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('.collections-carousel');
+    if (!carousel) return;
+
+    const track = document.querySelector('.collections-track');
+    const cards = document.querySelectorAll('.collection-card');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const dotsContainer = document.querySelector('.carousel-dots');
+    
+    let cardWidth = cards[0].offsetWidth + 30; // card width + gap
+    let currentPosition = 0;
+    let visibleCards = 3;
+    let totalCards = cards.length;
+    
+    // Create dots
+    function createDots() {
+        const dotCount = Math.ceil(totalCards / visibleCards);
+        dotsContainer.innerHTML = '';
+        
+        for (let i = 0; i < dotCount; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('carousel-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+    }
+    
+    // Update dots
+    function updateDots() {
+        const dots = document.querySelectorAll('.carousel-dot');
+        const activeDotIndex = Math.abs(currentPosition) / (cardWidth * visibleCards);
+        
+        dots.forEach((dot, index) => {
+            dot.classList.remove('active');
+            if (index === activeDotIndex) {
+                dot.classList.add('active');
+            }
+        });
+    }
+    
+    // Move carousel
+    function moveCarousel() {
+        track.style.transform = `translateX(${currentPosition}px)`;
+        updateDots();
+        
+        // Disable/enable buttons based on position
+        prevBtn.disabled = currentPosition === 0;
+        nextBtn.disabled = currentPosition <= -(totalCards - visibleCards) * cardWidth;
+    }
+    
+    // Go to specific slide
+    function goToSlide(slideIndex) {
+        currentPosition = -slideIndex * visibleCards * cardWidth;
+        moveCarousel();
+    }
+    
+    // Next button click
+    nextBtn.addEventListener('click', function() {
+        if (currentPosition > -(totalCards - visibleCards) * cardWidth) {
+            currentPosition -= cardWidth * visibleCards;
+            moveCarousel();
+        }
+    });
+    
+    // Previous button click
+    prevBtn.addEventListener('click', function() {
+        if (currentPosition < 0) {
+            currentPosition += cardWidth * visibleCards;
+            moveCarousel();
+        }
+    });
+    
+    // Touch events for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    track.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+    
+    track.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left - next
+            if (currentPosition > -(totalCards - visibleCards) * cardWidth) {
+                currentPosition -= cardWidth * visibleCards;
+                moveCarousel();
+            }
+        }
+        
+        if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right - previous
+            if (currentPosition < 0) {
+                currentPosition += cardWidth * visibleCards;
+                moveCarousel();
+            }
+        }
+    }
+    
+    // Quick view button
+    document.querySelectorAll('.quick-view-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productName = this.closest('.collection-card').querySelector('h3').textContent;
+            alert(`Quick view for ${productName} will be implemented later!`);
+        });
+    });
+    
+    // Wishlist button
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const icon = this.querySelector('i');
+            if (this.classList.contains('active')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        });
+    });
+    
+    // Initialize
+    function initCarousel() {
+        // Calculate visible cards based on screen size
+        if (window.innerWidth <= 1024 && window.innerWidth > 768) {
+            visibleCards = 2;
+        } else if (window.innerWidth <= 768) {
+            visibleCards = 1;
+        } else {
+            visibleCards = 3;
+        }
+        
+        cardWidth = cards[0].offsetWidth + 30;
+        createDots();
+    }
+    
+    // Recalculate on resize
+    window.addEventListener('resize', function() {
+        initCarousel();
+        moveCarousel();
+    });
+    
+    // Initial setup
+    initCarousel();
+});
