@@ -14,6 +14,29 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     </head>
+    <!-- Add this meta tag in the head section -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Add mobile menu structure before </body> -->
+<div class="mobile-menu-overlay"></div>
+<nav class="mobile-nav">
+    <div class="mobile-nav-header">
+        <span class="logo-icon">V</span>
+        <span class="logo-text">Vanam By SBS</span>
+        <button class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="mobile-nav-links">
+        <a href="#home" class="mobile-nav-link">Home</a>
+        <a href="#products" class="mobile-nav-link">Collections</a>
+        <a href="#about" class="mobile-nav-link">Story</a>
+        <a href="#contact" class="mobile-nav-link">Contact</a>
+        <a href="task-management/templates/login.html" class="mobile-nav-link task-link">
+            <i class="fas fa-tasks"></i> Task Portal
+        </a>
+    </div>
+</nav>
 <body>
     <!-- Animated Background -->
     <div class="particles-background" id="particles-js"></div>
